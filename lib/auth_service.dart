@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Every Firebase Auth call lives here (starter code, unchanged).
+/// Every Firebase Auth call lives here.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late final Stream<User?> authState = _auth.authStateChanges();

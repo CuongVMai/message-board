@@ -6,7 +6,6 @@ import 'login_screen.dart';
 import 'profile_gate.dart';
 
 /// Routes by auth state: signed out -> LoginScreen, signed in -> ProfileGate.
-/// (Starter "Hint Buddy" code, unchanged except imports.)
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
   @override

@@ -6,7 +6,7 @@ import 'auth_service.dart';
 import 'board_service.dart';
 
 ////// new file: one screen that switches between Sign in and Register.
-////// Built from the "Tiny Fix Quest" _submit pattern (busy flag = no double submit).
+////// The busy flag disables the button while a request runs (no double submit).
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override

@@ -8,7 +8,7 @@ class BoardService {
 
   // ---------------- USER RECORD (users/{uid}) ----------------
 
-  /// Starter saveUserRecord. Called ONCE, at registration (or from the
+  /// Saves the user record. Called ONCE, at registration (or from the
   /// "finish your profile" retry screen). Never on login.
   Future<void> saveUserRecord({
     required String uid,
@@ -51,17 +51,29 @@ class BoardService {
 
   // ---------------- MESSAGES (messages/{msgId}) ----------------
 
-  /// CREATE — uid-owned, server-timestamped
+  ////// SPICE #4: make a new document id up front (one id per draft message).
+  String newMessageId() => _db.collection('messages').doc().id;
+
+  /// CREATE — uid-owned, server-timestamped.
+  ////// SPICE #4 (idempotent): the id is decided before the write, and a
+  ////// transaction only creates the doc if it does not exist yet. So calling
+  ////// this twice with the same id (double-tap, retry) still leaves ONE doc.
   Future<void> postMessage({
+    required String messageId,
     required String authorUid,
     required String authorName,
     required String text,
   }) async {
-    await _db.collection('messages').add({
-      'authorUid': authorUid,
-      'authorName': authorName,
-      'text': text,
-      'createdAt': FieldValue.serverTimestamp(),
+    final ref = _db.collection('messages').doc(messageId);
+    await _db.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (snap.exists) return; // already created -> do nothing
+      tx.set(ref, {
+        'authorUid': authorUid,
+        'authorName': authorName,
+        'text': text,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
     });
   }
 

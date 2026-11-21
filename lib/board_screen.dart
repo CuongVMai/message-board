@@ -11,6 +11,11 @@ import 'models.dart';
 ////// someone else's post and watch Firestore reject it. Set back to false after.
 const bool kRulesTestMode = false;
 
+////// SPICE #4 TEST SWITCH: set to true ONLY to capture the duplicate-call
+////// evidence. One tap on Send then calls postMessage TWICE at the same time
+////// with the same id. Firestore should still end up with ONE document.
+const bool kDuplicateTestMode = false;
+
 ////// new file: the live message board (create / read / update / delete).
 class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key, required this.user, required this.profile});
@@ -27,6 +32,8 @@ class _BoardScreenState extends State<BoardScreen> {
   late final Stream<List<Message>> _messages = _board.messageBoard();
   final _text = TextEditingController();
   bool _posting = false;
+  ////// SPICE #4: one id per draft; a new id only after a successful post
+  late String _draftId = _board.newMessageId();
 
   @override
   void dispose() {
@@ -60,12 +67,20 @@ class _BoardScreenState extends State<BoardScreen> {
       _posting = true;
     });
     try {
-      await _board.postMessage(
+      ////// SPICE #4: same id every time this draft is sent
+      Future<void> send() => _board.postMessage(
+        messageId: _draftId,
         authorUid: widget.user.uid,
         authorName: widget.profile.fullName,
         text: text,
       );
+      if (kDuplicateTestMode) {
+        await Future.wait([send(), send()]); // deliberate duplicate call
+      } else {
+        await send();
+      }
       _text.clear();
+      _draftId = _board.newMessageId(); ////// fresh id for the next message
     } on FirebaseException catch (e) {
       _showFirebaseError(e);
     } finally {
