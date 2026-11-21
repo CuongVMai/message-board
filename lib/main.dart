@@ -65,15 +65,27 @@ class _SplashScreenState extends State<SplashScreen> {
         }
         if (snapshot.connectionState != ConnectionState.done) {
           ////// changed: styled splash instead of a plain spinner
-          return const Scaffold(
-            backgroundColor: Colors.indigo,
+          return Scaffold(
+            backgroundColor: Colors.green,
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.forum, size: 96, color: Colors.white),
-                  SizedBox(height: 16),
-                  Text(
+                  ////// cloud logo that "pops" in (grows from small with a bounce)
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 900),
+                    curve: Curves.elasticOut,
+                    builder: (context, scale, child) =>
+                        Transform.scale(scale: scale, child: child),
+                    child: const Icon(
+                      Icons.cloud,
+                      size: 120,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
                     'Message Board',
                     style: TextStyle(
                       color: Colors.white,
@@ -81,13 +93,13 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'Chatboards for the new age',
                     style: TextStyle(color: Colors.white70),
                   ),
-                  SizedBox(height: 32),
-                  CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 32),
+                  const CircularProgressIndicator(color: Colors.white),
                 ],
               ),
             ),
