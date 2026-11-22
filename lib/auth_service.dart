@@ -28,4 +28,8 @@ class AuthService {
   }
 
   Future<void> signOut() => _auth.signOut();
+
+  ////// SPICE #1: point Firebase Auth at the local Auth emulator
+  static Future<void> useEmulator(String host) =>
+      FirebaseAuth.instance.useAuthEmulator(host, 9099);
 }

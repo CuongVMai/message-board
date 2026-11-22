@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 import 'auth_gate.dart'; ////// added: AuthGate lives in its own file
+import 'auth_service.dart';
+import 'board_service.dart';
+
+////// SPICE #1 SWITCH: true = use the local Firebase Emulator Suite
+////// (run `firebase emulators:start` first). false = real Firebase project.
+////// Keep false for the submitted APK.
+const bool kUseEmulator = false;
+
+////// Android emulators reach your Mac's localhost through 10.0.2.2
+const String kEmulatorHost = '10.0.2.2';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +43,15 @@ class _SplashScreenState extends State<SplashScreen> {
     final app = await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    ////// SPICE #1: switch to the emulators before any Auth/Firestore call
+    if (kUseEmulator) {
+      try {
+        await AuthService.useEmulator(kEmulatorHost);
+        BoardService.useEmulator(kEmulatorHost);
+      } catch (_) {
+        // Already connected (e.g. after Retry) - safe to ignore.
+      }
+    }
     ////// added: keep the splash on screen ~2 seconds so it can be seen/screenshotted
     await Future.delayed(const Duration(seconds: 2));
     return app;

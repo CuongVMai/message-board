@@ -6,6 +6,10 @@ import 'models.dart';
 class BoardService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  ////// SPICE #1: point Firestore at the local Firestore emulator
+  static void useEmulator(String host) =>
+      FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
+
   // ---------------- USER RECORD (users/{uid}) ----------------
 
   /// Saves the user record. Called ONCE, at registration (or from the
